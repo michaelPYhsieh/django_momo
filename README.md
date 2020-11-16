@@ -21,6 +21,7 @@ pipenv run python manage.py qcluster
 ---
 
 # ABOUT THIS PROJECT
+This is a shopping site web crawler.
 - Django
 - Web Crawler: Selenium & bs4 
 - PostgresSQL
