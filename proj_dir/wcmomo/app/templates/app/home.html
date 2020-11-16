@@ -1,0 +1,151 @@
+{% extends 'app/base.html' %}
+{% block content %}
+
+<h3>首頁: {{ template_name }}</h3>
+
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<div id="scatter_area"></div>
+
+
+<script>
+    {% autoescape off %}
+    var data = {{ ltsale }};
+    {% endautoescape %}
+
+    // document.write(data)
+
+    var Ymax = d3.max(data, d => parseInt(d.g_discount));
+    var Ymin = d3.min(data, d => parseInt(d.g_discount));
+
+    var Xmax = d3.max(data, d => parseInt(d.g_prdprice));
+    var Xmin = d3.min(data, d => parseInt(d.g_prdprice));
+
+    var margin = { top: 10, right: 40, bottom: 30, left: 30 };
+    var height = 720;
+    var width = 1200;
+
+
+    var scaleX = d3.scaleLinear()
+        .domain([0, Xmax])
+        // .range([margin.left, width - margin.right]);
+        .range([0 + margin.left, width - margin.right]);
+
+
+    var scaleY = d3.scaleLinear()
+        .domain([Ymax, Ymin])
+        .range([0 + margin.top, height - margin.bottom]);
+
+
+    var svg01 = d3.select("#scatter_area")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .attr("viewBox", [0, 0, width, height]);
+
+
+    svg01
+        .append('g')
+        .attr("transform", `translate(${margin.left},${margin.top})`)
+        .call(d3.axisLeft(scaleY))
+        .call(g => g.append("text")
+            .attr("x", -margin.left)
+            .attr("y", 0)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "start")
+            .text('折扣比例(%)'))
+
+
+    svg01
+        .append('g')
+        .attr("transform", `translate(${0},${height - margin.bottom + margin.top})`)
+        .call(d3.axisBottom(scaleX)) //==.ticks(width / 80))
+        .call(g => g.append("text")
+            .attr("x", width)
+            .attr("y", margin.bottom - margin.top)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "end")
+            .text('現在售價($)'))
+
+
+    svg01.append("g")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 1.5)
+        .attr("fill", "none")
+        .selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => scaleX(parseInt(d.g_prdprice)))
+        .attr("cy", d => scaleY(parseInt(d.g_discount)))
+        .attr("r", 3)
+
+    svg01.append("g")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+        .selectAll("text")
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("dy", "0.35em")
+        .attr("x", d => scaleX(parseInt(d.g_prdprice)) + 5)
+        .attr("y", d => scaleY(parseInt(d.g_discount)))
+        .append('a')
+        .attr('href', d => d.href)
+        .text(d => d.prdname);
+
+
+</script>
+
+{% if bank_card %}
+<!-- ['bank_name', 'data', 'suffice', 'discount'] -->
+<table style="border:3px #cccccc solid;" cellpadding="10" border='1'>
+
+    <tr>
+        <td> 銀行 </td>
+        <td> 活動時間 </td>
+        <td> 優惠規則 </td>
+        <td> 優惠金額 </td>
+    </tr>
+    {% for bc in bank_card %}
+    <tr>
+        <td> {{ bc.bank_name }} </td>
+        <td> {{ bc.date }} </td>
+        <td> {{ bc.suffice }} </td>
+        <td> {{ bc.discount }} </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+
+
+<BR>
+
+
+   
+{% if ltsale %}
+<table style="border:3px #cccccc solid;" cellpadding="10" border='1'>
+    <tr>
+        <td> 折扣(低至高) </td>
+        <td> 品名 </td>
+        <td> 金額 </td>
+    </tr>
+    
+    {% for item in ltsale %}
+    <tr>
+        <td> {{ item.discount }} </td>
+        <td> <a href="{{ item.href }}"> {{ item.prdname }} </a> </td>
+        <td> {{ item.prdprice }} </td>
+    </tr>
+    {% endfor %}
+
+</table>
+{% endif %}
+
+
+<BR>
+
+
+{% endblock  %}

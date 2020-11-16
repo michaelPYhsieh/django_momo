@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+django-q = "*"
+beautifulsoup4 = "*"
+selenium = "*"
+lxml = "*"
+django = "*"
+psycopg2 = "*"
+psycopg2-binary = "*"
+django-admin-rangefilter = "*"
+
+[requires]
+python_version = "3.7"
