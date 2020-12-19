@@ -19,7 +19,7 @@
 > `Pipfile.lock` file is in the folder `proj_dir`.
 
 ```
-cd __folder
+cd proj_dir
 
 sudo docker-compose up
 
